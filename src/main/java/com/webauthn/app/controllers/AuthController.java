@@ -5,24 +5,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
-public class UserController {
+public class AuthController {
     @GetMapping("/")
     public String welcome() {
         return "index";
     }
 
-    @PostMapping("/")
+    @GetMapping("/register")
     public String register() {
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String newRegistration() {
         return "Hello!";
     }
 
-    @GetMapping("/signin")
-    public String existingUser() {
-        return "signin";
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
     }
 
-    @PostMapping("/signin")
-    public String logIn() {
+    @PostMapping("/login")
+    public String login() {
         return "Hello2!";
     }
 }
