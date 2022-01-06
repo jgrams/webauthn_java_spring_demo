@@ -54,6 +54,12 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.yubico</groupId>
+			<artifactId>webauthn-server-core</artifactId>
+			<version>1.12.1</version>
+			<scope>compile</scope>
+		  </dependency>
 	</dependencies>
 
 	<build>
