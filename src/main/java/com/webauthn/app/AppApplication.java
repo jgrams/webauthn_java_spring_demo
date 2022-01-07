@@ -4,28 +4,31 @@ import com.webauthn.app.data.repository.RegistrationRepository;
 import com.yubico.webauthn.RelyingParty;
 import com.yubico.webauthn.data.RelyingPartyIdentity;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class AppApplication {
-	private final RelyingParty rp;
 
 	public static void main(String[] args) {
 		SpringApplication.run(AppApplication.class, args);
-		configureWebAuthServer();
 	}
 
-	public static void configureWebAuthServer() {
+	@Bean
+	@Autowired
+	public RelyingParty relyingParty(RegistrationRepository regisrationRepository, WebAuthProperties properties) {
 		RelyingPartyIdentity rpIdentity = RelyingPartyIdentity.builder()
-			.id("example.com")
-			.name("Yubi Application")
+			.id(properties.getHostName())
+			.name(properties.getDisplay())
 			.build();
-		RelyingParty rp = RelyingParty.builder()
-			.identity(rpIdentity)
-			.credentialRepository(new RegistrationRepository())
-			.validateSignatureCounter(true)
-			.build();
-	}
 
+		return RelyingParty.builder()
+			.identity(rpIdentity)
+			.credentialRepository(regisrationRepository)
+			.origins(properties.getOrigin())
+			.build();
+		}
+	}
 }

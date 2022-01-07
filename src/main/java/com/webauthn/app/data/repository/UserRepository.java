@@ -4,8 +4,10 @@ import com.webauthn.app.data.objects.User;
 import com.yubico.webauthn.data.ByteArray;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends CrudRepository<Long, User> {
-    User findByUsername(String username);
-    User findByUserhandle(ByteArray userHandle);
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
+    User findByUsername(String name);
+    User findByHandle(ByteArray handle);
 }

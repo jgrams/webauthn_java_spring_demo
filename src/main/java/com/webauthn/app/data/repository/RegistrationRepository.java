@@ -13,7 +13,12 @@ import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialDescriptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import lombok.Getter;
+
+@Repository
+@Getter
 public class RegistrationRepository implements CredentialRepository {
     @Autowired
     private UserRepository userRepo;
@@ -36,12 +41,12 @@ public class RegistrationRepository implements CredentialRepository {
     @Override
     public Optional<ByteArray> getUserHandleForUsername(String username) {
         User user = userRepo.findByUsername(username);
-        return Optional.of(user.getUserHandle());
+        return Optional.of(user.getHandle());
     }
 
     @Override
     public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
-        User user = userRepo.findByUserhandle(userHandle);
+        User user = userRepo.findByHandle(userHandle);
         return Optional.of(user.getUsername());
     }
 
@@ -52,7 +57,7 @@ public class RegistrationRepository implements CredentialRepository {
             authenticator ->
                 RegisteredCredential.builder()
                     .credentialId(authenticator.getCredentialId())
-                    .userHandle(authenticator.getUser().getUserHandle())
+                    .userHandle(authenticator.getUser().getHandle())
                     .publicKeyCose(authenticator.getPublicKey())
                     .signatureCount(authenticator.getCount())
                     .build()
@@ -67,7 +72,7 @@ public class RegistrationRepository implements CredentialRepository {
             authenticator ->
                 RegisteredCredential.builder()
                 .credentialId(authenticator.getCredentialId())
-                .userHandle(authenticator.getUser().getUserHandle())
+                .userHandle(authenticator.getUser().getHandle())
                 .publicKeyCose(authenticator.getPublicKey())
                 .signatureCount(authenticator.getCount())
                 .build())

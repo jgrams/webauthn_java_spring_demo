@@ -8,8 +8,10 @@ import com.webauthn.app.data.objects.User;
 import com.yubico.webauthn.data.ByteArray;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AuthenticatorRepository extends CrudRepository<Long, Authenticator> {
+@Repository
+public interface AuthenticatorRepository extends CrudRepository<Authenticator, Long> {
     Optional<Authenticator> findByCredentialId(ByteArray credentialId);
     List<Authenticator> findAllByUser (User user);
     List<Authenticator> findAllByCredentialId(ByteArray credentialId);

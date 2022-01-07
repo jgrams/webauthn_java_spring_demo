@@ -13,11 +13,13 @@ import javax.persistence.OneToMany;
 import com.yubico.webauthn.data.ByteArray;
 
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Entity
 @Value
 @Builder
+@RequiredArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,11 +29,11 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String name;
+    private String displayname;
 
     @Lob
     @Column(nullable = false, length = 64)
-    private ByteArray userHandle;
+    private ByteArray handle;
 
     @OneToMany
     private Set<Authenticator> authenticators;

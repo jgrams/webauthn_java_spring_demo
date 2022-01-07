@@ -1,7 +1,5 @@
 package com.webauthn.app.data.objects;
 
-import java.util.Optional;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
-import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;
 
 import lombok.Builder;
@@ -25,7 +22,7 @@ public class Authenticator {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String name;
 
     @Lob
@@ -45,8 +42,4 @@ public class Authenticator {
 
     @ManyToOne
     private User user;
-
-    public Optional<RegisteredCredential> map() {
-        return null;
-    }
 }
