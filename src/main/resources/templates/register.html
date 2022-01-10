@@ -1,9 +1,15 @@
 <div class="main">
-<form action="/register" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username">
-    <label for="username">Display Name:</label>
-    <input type="text" name="name" id="name">
-    <button type="submit">Submit</button>
-</form>
+    <div id="errors"></div>
+    <form id="form" action="/registerauth" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
+        <label for="displayname">Display Name:</label>
+        <input type="text" name="display" id="display" required>
+        <label for="credentialname">Credential Name:</label>
+        <input type="text" name="credname" id="credname" required>
+        <button type="submit">Submit</button>
+    </form>
 </div>
+<script src="javascript/base64js.min.js"></script>
+<script src="javascript/custom.js"></script>
+<script src="javascript/registerauth.js"></script>

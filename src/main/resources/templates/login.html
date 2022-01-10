@@ -1,3 +1,12 @@
 <div class="main">
-    Sign In
+    <div id="error"></div>
+    <form action="/welcome" method="POST" id="form">
+        <label for="username">Your Username:</label>
+        <input type="text" id="username" name="username">
+        <input type="hidden" id="credential" name="credential">
+    </form>
+    <button id="submit" onclick="checkCredentials();">Sumbit</button>
 </div>
+<script src="javascript/base64js.min.js"></script>
+<script src="javascript/custom.js"></script>
+<script src="javascript/login.js"></script>
