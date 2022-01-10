@@ -11,15 +11,14 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 
 import com.yubico.webauthn.data.ByteArray;
+import com.yubico.webauthn.data.UserIdentity;
 
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Value
-@Builder
-@RequiredArgsConstructor
+@Getter
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,8 +32,26 @@ public class User {
 
     @Lob
     @Column(nullable = false, length = 64)
-    private ByteArray handle;
+    private byte[] handle;
 
     @OneToMany
-    private Set<Authenticator> authenticators;
+    private Set<Credential> authenticators;
+
+    public User(UserIdentity user) {
+        this.handle = user.getId().getBytes();
+        this.username = user.getName();
+        this.displayname = user.getDisplayName();
+    }
+
+    public UserIdentity toUserIdentity() {
+        return UserIdentity.builder()
+            .name(getUsername())
+            .displayName(getDisplayname())
+            .id(getByteArrayHandle())
+            .build();
+    }
+
+    public ByteArray getByteArrayHandle() {
+        return new ByteArray(getHandle());
+    }
 }

@@ -3,16 +3,15 @@ package com.webauthn.app.data.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.webauthn.app.data.objects.Authenticator;
+import com.webauthn.app.data.objects.Credential;
 import com.webauthn.app.data.objects.User;
-import com.yubico.webauthn.data.ByteArray;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AuthenticatorRepository extends CrudRepository<Authenticator, Long> {
-    Optional<Authenticator> findByCredentialId(ByteArray credentialId);
-    List<Authenticator> findAllByUser (User user);
-    List<Authenticator> findAllByCredentialId(ByteArray credentialId);
+public interface AuthenticatorRepository extends CrudRepository<Credential, Long> {
+    Optional<Credential> findByCredentialId(byte[] credentialId);
+    List<Credential> findAllByUser (User user);
+    List<Credential> findAllByCredentialId(byte[] credentialId);
 }

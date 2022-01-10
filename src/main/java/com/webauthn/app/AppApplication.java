@@ -29,6 +29,5 @@ public class AppApplication {
 			.credentialRepository(regisrationRepository)
 			.origins(properties.getOrigin())
 			.build();
-		}
 	}
 }
