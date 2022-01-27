@@ -1,12 +1,23 @@
-<div class="main">
-    <div id="error"></div>
-    <form action="/welcome" method="POST" id="form">
-        <label for="username">Your Username:</label>
-        <input type="text" id="username" name="username">
-        <input type="hidden" id="credential" name="credential">
-    </form>
-    <button id="submit" onclick="checkCredentials();">Sumbit</button>
-</div>
-<script src="javascript/base64js.min.js"></script>
-<script src="javascript/custom.js"></script>
-<script src="javascript/login.js"></script>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>WebAuthn Example</title>
+        <link th:href="@{/css/tachyons.css}" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="db fw6 lh-copy f6">
+            <div id="error"></div>
+            <form class="measure center" action="/welcome" method="POST" id="form">
+                <legend class="f4 fw6 ph0 mh0">Login</legend>
+                <label class="db fw6 lh-copy f6" for="username">Your Username:</label>
+                <input class="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" id="username" name="username">
+                <input type="hidden" id="credential" name="credential">
+            </form>
+            <button class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" id="submit" onclick="checkCredentials();">Sumbit</button>
+        </div>
+    </body>
+    <script src="javascript/base64js.min.js"></script>
+    <script src="javascript/custom.js"></script>
+    <script src="javascript/login.js"></script>
+</html>

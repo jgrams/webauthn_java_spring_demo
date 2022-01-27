@@ -1,7 +1,17 @@
-<div class="main">
-    <h1>WebAuthn Example</h1>
-    <h2>New User</h2>
-    <a href="/register">Register</a>
-    <h2>Existing Users</h2>
-    <a href="/login">Sign In</a>
-</div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>WebAuthn Example</title>
+        <link th:href="@{/css/tachyons.css}" rel="stylesheet" />
+    </head>
+    <body class="pa4 black-80">
+        <div class="measure center">
+            <h1>WebAuthn Example</h1>
+            <h2>New User</h2>
+            <a class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" href="/register">Register</a>
+            <h2>Existing Users</h2>
+            <a class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" href="/login">Sign In</a>
+        </div>
+    </body>
+</html>

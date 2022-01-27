@@ -1,15 +1,32 @@
-<div class="main">
-    <div id="errors"></div>
-    <form id="form" action="/registerauth" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
-        <label for="displayname">Display Name:</label>
-        <input type="text" name="display" id="display" required>
-        <label for="credentialname">Credential Name:</label>
-        <input type="text" name="credname" id="credname" required>
-        <button type="submit">Submit</button>
-    </form>
-</div>
-<script src="javascript/base64js.min.js"></script>
-<script src="javascript/custom.js"></script>
-<script src="javascript/registerauth.js"></script>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>WebAuthn Example</title>
+        <link th:href="@{/css/tachyons.css}" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="pa4 black-80">
+            <div id="errors"></div>
+            <form class="measure center" id="form" action="/registerauth" method="POST">
+                <legend class="f4 fw6 ph0 mh0">Register Authentication</legend>
+                <div class="mt3">
+                    <label class="db fw6 lh-copy f6" for="username">Username:</label>
+                    <input class="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" name="username" id="username" required>
+                </div>
+                <div class="mt3">
+                    <label class="db fw6 lh-copy f6" for="displayname">Display Name:</label>
+                    <input class="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" name="display" id="display" required>
+                </div>
+                <div class="mt3">
+                    <label class="db fw6 lh-copy f6" for="credentialname">Credential Name:</label>
+                    <input class="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" name="credname" id="credname" required>
+                </div>
+                <button class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" type="submit">Submit</button>
+            </form>
+        </div>
+    </body>
+    <script src="javascript/base64js.min.js"></script>
+    <script src="javascript/custom.js"></script>
+    <script src="javascript/registerauth.js"></script>
+</html>
