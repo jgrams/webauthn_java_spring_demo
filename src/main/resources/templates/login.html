@@ -5,16 +5,17 @@
         <title>WebAuthn Example</title>
         <link th:href="@{/css/tachyons.css}" rel="stylesheet" />
     </head>
-    <body>
-        <div class="db fw6 lh-copy f6">
+    <body class="black-80">
+        <div th:replace="header :: header">...</div>
+        <div class="db fw6 lh-copy f6 measure center">
             <div id="error"></div>
-            <form class="measure center" action="/welcome" method="POST" id="form">
-                <legend class="f4 fw6 ph0 mh0">Login</legend>
+            <form action="/welcome" method="POST" id="form">
+                <legend class="f2 f1-l fw2 mb0 lh-title">Login</legend>
                 <label class="db fw6 lh-copy f6" for="username">Your Username:</label>
-                <input class="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" id="username" name="username">
+                <input class="pa2 input-reset ba bg-transparent hover-bg-purple hover-white w-100" type="text" id="username" name="username">
                 <input type="hidden" id="credential" name="credential">
             </form>
-            <button class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" id="submit" onclick="checkCredentials();">Sumbit</button>
+            <button class="ba bw1 mv2 f6 no-underline br-pill ph3 pv2 dib white b--purple bg-purple" id="submit" onclick="checkCredentials();">Sumbit</button>
         </div>
     </body>
     <script src="javascript/base64js.min.js"></script>

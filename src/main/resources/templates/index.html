@@ -5,13 +5,19 @@
         <title>WebAuthn Example</title>
         <link th:href="@{/css/tachyons.css}" rel="stylesheet" />
     </head>
-    <body class="pa4 black-80">
+    <body class="black-80">
+        <div th:replace="header :: header">...</div>
         <div class="measure center">
-            <h1>WebAuthn Example</h1>
-            <h2>New User</h2>
-            <a class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" href="/register">Register</a>
-            <h2>Existing Users</h2>
-            <a class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6" href="/login">Sign In</a>
+            <h1 class="f2 f1-l fw2 mb0 lh-title">WebAuthn Example</h1>
+            <div class="mv2">
+                <h2 class="fw1 f3 mt3 mb4 mr2 dib">New User:</h2>
+                <a class="ba bw1 f6 no-underline br-pill ph3 pv2 mb2 dib white bg-hot-pink" href="/register">Register</a>
+            </div>
+            <div class="mv2">
+                <h2 class="fw1 f3 mt3 mb4 mr2 dib">Existing Users:</h2>
+                <a class="ba bw1 f6 no-underline br-pill ph3 pv2 mb2 dib white bg-purple" href="/login">Sign In</a>
+            </div>
+
         </div>
     </body>
 </html>
