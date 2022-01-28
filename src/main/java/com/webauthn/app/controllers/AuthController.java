@@ -89,7 +89,16 @@ public class AuthController {
         User existingUser = registrationRepo.getUserRepo().findByHandle(user.getHandle());
         if (existingUser != null) {
             UserIdentity userIdentity = user.toUserIdentity();
-            return initiateCredential(userIdentity);
+            StartRegistrationOptions registrationOptions = StartRegistrationOptions.builder()
+            .user(userIdentity)
+            .build();
+            PublicKeyCredentialCreationOptions registration = relyingParty.startRegistration(registrationOptions);
+            cache.getCredentialCache().put(userIdentity.getId(), registration);
+                try {
+                    return registration.toCredentialsCreateJson();
+                } catch (JsonProcessingException e) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing JSON.", e);
+                }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User " + user.getUsername() + " does not exist. Please register.");
         }
@@ -170,25 +179,11 @@ public class AuthController {
             } else {
                 return "index";
             }
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            return e1.getMessage();
+        } catch (IOException e) {
+            throw new RuntimeException("Authentication failed", e);
         } catch (AssertionFailedException e) {
             throw new RuntimeException("Authentication failed", e);
         }
 
-    }
-
-    private String initiateCredential(UserIdentity user) {
-        StartRegistrationOptions registrationOptions = StartRegistrationOptions.builder()
-            .user(user)
-            .build();
-        PublicKeyCredentialCreationOptions registration = relyingParty.startRegistration(registrationOptions);
-        cache.getCredentialCache().put(user.getId(), registration);
-        try {
-            return registration.toCredentialsCreateJson();
-        } catch (JsonProcessingException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing JSON.", e);
-        }
     }
 }
