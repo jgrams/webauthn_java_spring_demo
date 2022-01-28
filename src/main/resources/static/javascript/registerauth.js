@@ -46,8 +46,6 @@ document.addEventListener("submit", (e) => {
         followRedirect(response);
     })
     .catch((error) => {
-        const errorElem = document.getElementById('errors');
-        errorElem.innerHTML = error;
-        console.error(error);
+        displayError(error);
     });
 })

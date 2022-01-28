@@ -18,7 +18,7 @@ class WebAuthServerError extends Error {
     }
 }
 function throwError(response) {
-    throw new WebAuthServerError("test", "testmessage");
+    throw new WebAuthServerError("Error from client", response.body);
 }
 function checkStatus(response) {
     if (response.status !== 200) {
@@ -38,6 +38,8 @@ function followRedirect(response) {
         throwError(response);
     }
 }
-function displayError() {
-
+function displayError(error) {
+    const errorElem = document.getElementById('errors');
+    errorElem.innerHTML = error;
+    console.error(error);
 }
