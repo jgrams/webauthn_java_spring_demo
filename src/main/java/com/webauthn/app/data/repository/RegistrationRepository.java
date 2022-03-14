@@ -25,57 +25,57 @@ public class RegistrationRepository implements CredentialRepository {
     @Autowired
     private AuthenticatorRepository authRepo;
 
-    @Override
-    public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
-        User user = userRepo.findByUsername(username);
-        List<Credential> auth = authRepo.findAllByUser(user);
-        return auth.stream()
-        .map(
-            authenticator ->
-                PublicKeyCredentialDescriptor.builder()
-                    .id(new ByteArray(authenticator.getCredentialId()))
-                    .build())
-        .collect(Collectors.toSet());
-    }
+@Override
+public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
+    User user = userRepo.findByUsername(username);
+    List<Credential> auth = authRepo.findAllByUser(user);
+    return auth.stream()
+    .map(
+        authenticator ->
+            PublicKeyCredentialDescriptor.builder()
+                .id(new ByteArray(authenticator.getCredentialId()))
+                .build())
+    .collect(Collectors.toSet());
+}
 
-    @Override
-    public Optional<ByteArray> getUserHandleForUsername(String username) {
-        User user = userRepo.findByUsername(username);
-        return Optional.of(user.getByteArrayHandle());
-    }
+@Override
+public Optional<ByteArray> getUserHandleForUsername(String username) {
+    User user = userRepo.findByUsername(username);
+    return Optional.of(user.getByteArrayHandle());
+}
 
-    @Override
-    public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
-        User user = userRepo.findByHandle(userHandle.getBytes());
-        return Optional.of(user.getUsername());
-    }
+@Override
+public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
+    User user = userRepo.findByHandle(userHandle.getBytes());
+    return Optional.of(user.getUsername());
+}
 
-    @Override
-    public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
-        Optional<Credential> auth = authRepo.findByCredentialId(credentialId.getBytes());
-        return auth.map(
-            authenticator ->
-                RegisteredCredential.builder()
-                    .credentialId(authenticator.getByteArrayPublicKey())
-                    .userHandle(authenticator.getUser().getByteArrayHandle())
-                    .publicKeyCose(authenticator.getByteArrayPublicKey())
-                    .signatureCount(authenticator.getCount())
-                    .build()
-        );
-    }
+@Override
+public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
+    Optional<Credential> auth = authRepo.findByCredentialId(credentialId.getBytes());
+    return auth.map(
+        authenticator ->
+            RegisteredCredential.builder()
+                .credentialId(authenticator.getByteArrayPublicKey())
+                .userHandle(authenticator.getUser().getByteArrayHandle())
+                .publicKeyCose(authenticator.getByteArrayPublicKey())
+                .signatureCount(authenticator.getCount())
+                .build()
+    );
+}
 
-    @Override
-    public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
-        List<Credential> auth = authRepo.findAllByCredentialId(credentialId.getBytes());
-        return auth.stream()
-        .map(
-            authenticator ->
-                RegisteredCredential.builder()
-                    .credentialId(authenticator.getByteArrayCredentialId())
-                    .userHandle(authenticator.getUser().getByteArrayHandle())
-                    .publicKeyCose(authenticator.getByteArrayPublicKey())
-                    .signatureCount(authenticator.getCount())
-                    .build())
-        .collect(Collectors.toSet());
-    }
+@Override
+public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
+    List<Credential> auth = authRepo.findAllByCredentialId(credentialId.getBytes());
+    return auth.stream()
+    .map(
+        authenticator ->
+            RegisteredCredential.builder()
+                .credentialId(authenticator.getByteArrayCredentialId())
+                .userHandle(authenticator.getUser().getByteArrayHandle())
+                .publicKeyCose(authenticator.getByteArrayPublicKey())
+                .signatureCount(authenticator.getCount())
+                .build())
+    .collect(Collectors.toSet());
+}
 }
