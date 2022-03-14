@@ -1,4 +1,4 @@
-package com.webauthn.app.credential;
+package com.webauthn.app.authenticator;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Credential {
+public class Authenticator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,7 +49,7 @@ public class Credential {
     @ManyToOne
     private AppUser user;
 
-    public Credential(RegistrationResult result, AuthenticatorAttestationResponse response, AppUser user, String name) {
+    public Authenticator(RegistrationResult result, AuthenticatorAttestationResponse response, AppUser user, String name) {
         Optional<AttestedCredentialData> attestationData = response.getAttestation().getAuthenticatorData().getAttestedCredentialData();
         this.credentialId = result.getKeyId().getId().getBytes();
         this.publicKey = result.getPublicKeyCose().getBytes();
