@@ -123,7 +123,7 @@ public class AuthController {
                         .build();
                     RegistrationResult result = relyingParty.finishRegistration(options);
                     Credential savedAuth = new Credential(result, pkc.getResponse(), user, credname);
-                    service.getAuthRepo().save(savedAuth);
+                    service.getCredentialRepo().save(savedAuth);
                     return new ModelAndView("redirect:/login", HttpStatus.SEE_OTHER);
                 } else {
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cached request expired. Try to register again!");
@@ -162,7 +162,8 @@ public class AuthController {
     @PostMapping("/welcome")
     public String finishLogin(
         @RequestParam String credential,
-        @RequestParam String username
+        @RequestParam String username,
+        Model model
     ) {
         try {
             PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> pkc;
@@ -174,6 +175,7 @@ public class AuthController {
                 .response(pkc)
                 .build());
             if (result.isSuccess()) {
+                model.addAttribute("username", username);
                 return "welcome";
             } else {
                 return "index";
