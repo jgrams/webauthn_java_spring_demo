@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.webauthn.app.data.objects.Credential;
-import com.webauthn.app.data.objects.User;
+import com.webauthn.app.data.objects.AppUser;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;
@@ -27,7 +27,7 @@ public class RegistrationRepository implements CredentialRepository {
 
 @Override
 public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
-    User user = userRepo.findByUsername(username);
+    AppUser user = userRepo.findByUsername(username);
     List<Credential> auth = authRepo.findAllByUser(user);
     return auth.stream()
     .map(
@@ -40,13 +40,13 @@ public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String use
 
 @Override
 public Optional<ByteArray> getUserHandleForUsername(String username) {
-    User user = userRepo.findByUsername(username);
+    AppUser user = userRepo.findByUsername(username);
     return Optional.of(user.getByteArrayHandle());
 }
 
 @Override
 public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
-    User user = userRepo.findByHandle(userHandle.getBytes());
+    AppUser user = userRepo.findByHandle(userHandle.getBytes());
     return Optional.of(user.getUsername());
 }
 

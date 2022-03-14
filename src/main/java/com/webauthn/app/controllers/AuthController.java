@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webauthn.app.EhCache;
 import com.webauthn.app.Utility;
 import com.webauthn.app.data.objects.Credential;
-import com.webauthn.app.data.objects.User;
+import com.webauthn.app.data.objects.AppUser;
 import com.webauthn.app.data.repository.RegistrationRepository;
 import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.AssertionResult;
@@ -65,14 +65,14 @@ public class AuthController {
         @RequestParam String username,
         @RequestParam String display
     ) {
-        User existingUser = registrationRepo.getUserRepo().findByUsername(username);
+        AppUser existingUser = registrationRepo.getUserRepo().findByUsername(username);
         if (existingUser == null) {
             UserIdentity userIdentity = UserIdentity.builder()
                 .name(username)
                 .displayName(display)
                 .id(Utility.generateRandom(32))
                 .build();
-            User saveUser = new User(userIdentity);
+            AppUser saveUser = new AppUser(userIdentity);
             registrationRepo.getUserRepo().save(saveUser);
             String response = newAuthRegistration(saveUser);
             return response;
@@ -84,9 +84,9 @@ public class AuthController {
     @PostMapping("/registerauth")
     @ResponseBody
     public String newAuthRegistration(
-        @RequestParam User user
+        @RequestParam AppUser user
     ) {
-        User existingUser = registrationRepo.getUserRepo().findByHandle(user.getHandle());
+        AppUser existingUser = registrationRepo.getUserRepo().findByHandle(user.getHandle());
         if (existingUser != null) {
             UserIdentity userIdentity = user.toUserIdentity();
             StartRegistrationOptions registrationOptions = StartRegistrationOptions.builder()
@@ -112,7 +112,7 @@ public class AuthController {
         @RequestParam String credname
     ) {
             try {
-                User user = registrationRepo.getUserRepo().findByUsername(username);
+                AppUser user = registrationRepo.getUserRepo().findByUsername(username);
                 if (cache.getCredentialCache().containsKey(user.getByteArrayHandle())) {
                     PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> pkc =
                     PublicKeyCredential.parseRegistrationResponseJson(credential);

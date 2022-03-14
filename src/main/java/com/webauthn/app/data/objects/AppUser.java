@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class User {
+public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -37,7 +37,7 @@ public class User {
     @OneToMany
     private Set<Credential> authenticators;
 
-    public User(UserIdentity user) {
+    public AppUser(UserIdentity user) {
         this.handle = user.getId().getBytes();
         this.username = user.getName();
         this.displayname = user.getDisplayName();

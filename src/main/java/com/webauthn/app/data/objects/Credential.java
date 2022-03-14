@@ -46,9 +46,9 @@ public class Credential {
     private byte[] aaguid;
 
     @ManyToOne
-    private User user;
+    private AppUser user;
 
-    public Credential(RegistrationResult result, AuthenticatorAttestationResponse response, User user, String name) {
+    public Credential(RegistrationResult result, AuthenticatorAttestationResponse response, AppUser user, String name) {
         Optional<AttestedCredentialData> attestationData = response.getAttestation().getAuthenticatorData().getAttestedCredentialData();
         this.credentialId = result.getKeyId().getId().getBytes();
         this.publicKey = result.getPublicKeyCose().getBytes();
