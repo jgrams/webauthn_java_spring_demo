@@ -3,7 +3,7 @@ package com.webauthn.app.web;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.webauthn.app.credential.Credential;
+import com.webauthn.app.authenticator.Authenticator;
 import com.webauthn.app.user.AppUser;
 import com.webauthn.app.utility.EhCache;
 import com.webauthn.app.utility.Utility;
@@ -122,8 +122,8 @@ public class AuthController {
                         .response(pkc)
                         .build();
                     RegistrationResult result = relyingParty.finishRegistration(options);
-                    Credential savedAuth = new Credential(result, pkc.getResponse(), user, credname);
-                    service.getCredentialRepo().save(savedAuth);
+                    Authenticator savedAuth = new Authenticator(result, pkc.getResponse(), user, credname);
+                    service.getAuthRepository().save(savedAuth);
                     return new ModelAndView("redirect:/login", HttpStatus.SEE_OTHER);
                 } else {
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cached request expired. Try to register again!");

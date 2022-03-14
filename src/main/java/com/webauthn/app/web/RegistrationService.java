@@ -5,7 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.webauthn.app.credential.Credential;
+import com.webauthn.app.authenticator.Authenticator;
+import com.webauthn.app.authenticator.AuthenticatorRepository;
 import com.webauthn.app.user.AppUser;
 import com.webauthn.app.user.UserRepository;
 import com.yubico.webauthn.CredentialRepository;
@@ -20,63 +21,63 @@ import lombok.Getter;
 
 @Repository
 @Getter
-public class RegistrationService implements CredentialRepository {
+public class RegistrationService implements CredentialRepository  {
     @Autowired
     private UserRepository userRepo;
     @Autowired
-    private CredentialRepository credentialRepo;
+    private AuthenticatorRepository authRepository;
 
-@Override
-public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
-    AppUser user = userRepo.findByUsername(username);
-    List<Credential> auth = credentialRepo.findAllByUser(user);
-    return auth.stream()
-    .map(
-        authenticator ->
-            PublicKeyCredentialDescriptor.builder()
-                .id(new ByteArray(authenticator.getCredentialId()))
-                .build())
-    .collect(Collectors.toSet());
-}
+    @Override
+    public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
+        AppUser user = userRepo.findByUsername(username);
+        List<Authenticator> auth = authRepository.findAllByUser(user);
+        return auth.stream()
+        .map(
+            credential ->
+                PublicKeyCredentialDescriptor.builder()
+                    .id(new ByteArray(credential.getCredentialId()))
+                    .build())
+        .collect(Collectors.toSet());
+    }
 
-@Override
-public Optional<ByteArray> getUserHandleForUsername(String username) {
-    AppUser user = userRepo.findByUsername(username);
-    return Optional.of(user.getByteArrayHandle());
-}
+    @Override
+    public Optional<ByteArray> getUserHandleForUsername(String username) {
+        AppUser user = userRepo.findByUsername(username);
+        return Optional.of(user.getByteArrayHandle());
+    }
 
-@Override
-public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
-    AppUser user = userRepo.findByHandle(userHandle.getBytes());
-    return Optional.of(user.getUsername());
-}
+    @Override
+    public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
+        AppUser user = userRepo.findByHandle(userHandle.getBytes());
+        return Optional.of(user.getUsername());
+    }
 
-@Override
-public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
-    Optional<Credential> auth = credentialRepo.findByCredentialId(credentialId.getBytes());
-    return auth.map(
-        authenticator ->
-            RegisteredCredential.builder()
-                .credentialId(authenticator.getByteArrayPublicKey())
-                .userHandle(authenticator.getUser().getByteArrayHandle())
-                .publicKeyCose(authenticator.getByteArrayPublicKey())
-                .signatureCount(authenticator.getCount())
-                .build()
-    );
-}
+    @Override
+    public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
+        Optional<Authenticator> auth = authRepository.findByCredentialId(credentialId.getBytes());
+        return auth.map(
+            credential ->
+                RegisteredCredential.builder()
+                    .credentialId(credential.getByteArrayPublicKey())
+                    .userHandle(credential.getUser().getByteArrayHandle())
+                    .publicKeyCose(credential.getByteArrayPublicKey())
+                    .signatureCount(credential.getCount())
+                    .build()
+        );
+    }
 
-@Override
-public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
-    List<Credential> auth = credentialRepo.findAllByCredentialId(credentialId.getBytes());
-    return auth.stream()
-    .map(
-        authenticator ->
-            RegisteredCredential.builder()
-                .credentialId(authenticator.getByteArrayCredentialId())
-                .userHandle(authenticator.getUser().getByteArrayHandle())
-                .publicKeyCose(authenticator.getByteArrayPublicKey())
-                .signatureCount(authenticator.getCount())
-                .build())
-    .collect(Collectors.toSet());
-}
+    @Override
+    public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
+        List<Authenticator> auth = authRepository.findAllByCredentialId(credentialId.getBytes());
+        return auth.stream()
+        .map(
+            credential ->
+                RegisteredCredential.builder()
+                    .credentialId(credential.getByteArrayCredentialId())
+                    .userHandle(credential.getUser().getByteArrayHandle())
+                    .publicKeyCose(credential.getByteArrayPublicKey())
+                    .signatureCount(credential.getCount())
+                    .build())
+        .collect(Collectors.toSet());
+    }
 }
