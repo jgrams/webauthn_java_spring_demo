@@ -5,9 +5,9 @@
         <title>WebAuthn Example</title>
         <link th:href="@{/css/tachyons.css}" rel="stylesheet" />
     </head>
-    <body class="black-80">
+    <body class="black-80 tc">
         <div th:replace="header :: header">...</div>
         <h1>Welcome</h1>
-        <h2>${user}</h2>
+        <h2 th:text="${username}">Username</h2>
     </body>
 </html>
