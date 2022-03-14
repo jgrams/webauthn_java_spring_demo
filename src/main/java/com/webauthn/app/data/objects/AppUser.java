@@ -31,7 +31,7 @@ public class AppUser {
     private String displayname;
 
     @Lob
-    @Column(nullable = false, unique = true, length = 64)
+    @Column(nullable = false, length = 64)
     private byte[] handle;
 
     @OneToMany
