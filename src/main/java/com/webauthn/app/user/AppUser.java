@@ -1,4 +1,4 @@
-package com.webauthn.app.data.objects;
+package com.webauthn.app.user;
 
 import java.util.Set;
 
@@ -33,9 +33,6 @@ public class AppUser {
     @Lob
     @Column(nullable = false, length = 64)
     private byte[] handle;
-
-    @OneToMany
-    private Set<Credential> authenticators;
 
     public AppUser(UserIdentity user) {
         this.handle = user.getId().getBytes();

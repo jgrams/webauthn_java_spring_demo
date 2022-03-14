@@ -1,12 +1,13 @@
-package com.webauthn.app.data.repository;
+package com.webauthn.app.web;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.webauthn.app.data.objects.Credential;
-import com.webauthn.app.data.objects.AppUser;
+import com.webauthn.app.credential.Credential;
+import com.webauthn.app.user.AppUser;
+import com.webauthn.app.user.UserRepository;
 import com.yubico.webauthn.CredentialRepository;
 import com.yubico.webauthn.RegisteredCredential;
 import com.yubico.webauthn.data.ByteArray;
@@ -19,16 +20,16 @@ import lombok.Getter;
 
 @Repository
 @Getter
-public class RegistrationRepository implements CredentialRepository {
+public class RegistrationService implements CredentialRepository {
     @Autowired
     private UserRepository userRepo;
     @Autowired
-    private AuthenticatorRepository authRepo;
+    private CredentialRepository credentialRepo;
 
 @Override
 public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
     AppUser user = userRepo.findByUsername(username);
-    List<Credential> auth = authRepo.findAllByUser(user);
+    List<Credential> auth = credentialRepo.findAllByUser(user);
     return auth.stream()
     .map(
         authenticator ->
@@ -52,7 +53,7 @@ public Optional<String> getUsernameForUserHandle(ByteArray userHandle) {
 
 @Override
 public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray userHandle) {
-    Optional<Credential> auth = authRepo.findByCredentialId(credentialId.getBytes());
+    Optional<Credential> auth = credentialRepo.findByCredentialId(credentialId.getBytes());
     return auth.map(
         authenticator ->
             RegisteredCredential.builder()
@@ -66,7 +67,7 @@ public Optional<RegisteredCredential> lookup(ByteArray credentialId, ByteArray u
 
 @Override
 public Set<RegisteredCredential> lookupAll(ByteArray credentialId) {
-    List<Credential> auth = authRepo.findAllByCredentialId(credentialId.getBytes());
+    List<Credential> auth = credentialRepo.findAllByCredentialId(credentialId.getBytes());
     return auth.stream()
     .map(
         authenticator ->

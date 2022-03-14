@@ -1,4 +1,4 @@
-package com.webauthn.app.data.objects;
+package com.webauthn.app.credential;
 
 import java.util.Optional;
 
@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
+import com.webauthn.app.user.AppUser;
 import com.yubico.webauthn.RegistrationResult;
 import com.yubico.webauthn.data.AttestedCredentialData;
 import com.yubico.webauthn.data.AuthenticatorAttestationResponse;

@@ -1,4 +1,4 @@
-package com.webauthn.app;
+package com.webauthn.app.utility;
 
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;

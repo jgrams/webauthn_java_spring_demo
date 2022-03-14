@@ -1,13 +1,12 @@
-package com.webauthn.app.controllers;
+package com.webauthn.app.web;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.webauthn.app.EhCache;
-import com.webauthn.app.Utility;
-import com.webauthn.app.data.objects.Credential;
-import com.webauthn.app.data.objects.AppUser;
-import com.webauthn.app.data.repository.RegistrationRepository;
+import com.webauthn.app.credential.Credential;
+import com.webauthn.app.user.AppUser;
+import com.webauthn.app.utility.EhCache;
+import com.webauthn.app.utility.Utility;
 import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.AssertionResult;
 import com.yubico.webauthn.FinishAssertionOptions;
@@ -40,12 +39,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthController {
 
     private RelyingParty relyingParty;
-    private RegistrationRepository registrationRepo;
+    private RegistrationService service;
     private EhCache cache;
 
-    AuthController(RegistrationRepository regisrationRepo, RelyingParty relyingPary) {
+    AuthController(RegistrationService service, RelyingParty relyingPary) {
         this.relyingParty = relyingPary;
-        this.registrationRepo = regisrationRepo;
+        this.service = service;
         this.cache = new EhCache();
     }
 
@@ -65,7 +64,7 @@ public class AuthController {
         @RequestParam String username,
         @RequestParam String display
     ) {
-        AppUser existingUser = registrationRepo.getUserRepo().findByUsername(username);
+        AppUser existingUser = service.getUserRepo().findByUsername(username);
         if (existingUser == null) {
             UserIdentity userIdentity = UserIdentity.builder()
                 .name(username)
@@ -73,7 +72,7 @@ public class AuthController {
                 .id(Utility.generateRandom(32))
                 .build();
             AppUser saveUser = new AppUser(userIdentity);
-            registrationRepo.getUserRepo().save(saveUser);
+            service.getUserRepo().save(saveUser);
             String response = newAuthRegistration(saveUser);
             return response;
         } else {
@@ -86,7 +85,7 @@ public class AuthController {
     public String newAuthRegistration(
         @RequestParam AppUser user
     ) {
-        AppUser existingUser = registrationRepo.getUserRepo().findByHandle(user.getHandle());
+        AppUser existingUser = service.getUserRepo().findByHandle(user.getHandle());
         if (existingUser != null) {
             UserIdentity userIdentity = user.toUserIdentity();
             StartRegistrationOptions registrationOptions = StartRegistrationOptions.builder()
@@ -112,7 +111,7 @@ public class AuthController {
         @RequestParam String credname
     ) {
             try {
-                AppUser user = registrationRepo.getUserRepo().findByUsername(username);
+                AppUser user = service.getUserRepo().findByUsername(username);
                 if (cache.getCredentialCache().containsKey(user.getByteArrayHandle())) {
                     PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> pkc =
                     PublicKeyCredential.parseRegistrationResponseJson(credential);
@@ -124,7 +123,7 @@ public class AuthController {
                         .build();
                     RegistrationResult result = relyingParty.finishRegistration(options);
                     Credential savedAuth = new Credential(result, pkc.getResponse(), user, credname);
-                    registrationRepo.getAuthRepo().save(savedAuth);
+                    service.getAuthRepo().save(savedAuth);
                     return new ModelAndView("redirect:/login", HttpStatus.SEE_OTHER);
                 } else {
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cached request expired. Try to register again!");

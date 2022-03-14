@@ -1,4 +1,4 @@
-package com.webauthn.app;
+package com.webauthn.app.configuration;
 
 import java.util.Set;
 
