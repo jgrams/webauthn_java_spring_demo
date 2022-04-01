@@ -25,27 +25,23 @@ public class AppUser {
     private String username;
 
     @Column(nullable = false)
-    private String displayname;
+    private String displayName;
 
     @Lob
     @Column(nullable = false, length = 64)
-    private byte[] handle;
+    private ByteArray handle;
 
     public AppUser(UserIdentity user) {
-        this.handle = user.getId().getBytes();
+        this.handle = user.getId();
         this.username = user.getName();
-        this.displayname = user.getDisplayName();
+        this.displayName = user.getDisplayName();
     }
 
     public UserIdentity toUserIdentity() {
         return UserIdentity.builder()
             .name(getUsername())
-            .displayName(getDisplayname())
-            .id(getByteArrayHandle())
+            .displayName(getDisplayName())
+            .id(getHandle())
             .build();
-    }
-
-    public ByteArray getByteArrayHandle() {
-        return new ByteArray(getHandle());
     }
 }

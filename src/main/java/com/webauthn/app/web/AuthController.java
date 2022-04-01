@@ -112,11 +112,11 @@ public class AuthController {
     ) {
             try {
                 AppUser user = service.getUserRepo().findByUsername(username);
-                if (cache.getCredentialCache().containsKey(user.getByteArrayHandle())) {
+                if (cache.getCredentialCache().containsKey(user.getHandle())) {
                     PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> pkc =
                     PublicKeyCredential.parseRegistrationResponseJson(credential);
-                    PublicKeyCredentialCreationOptions requestOptions = cache.getCredentialCache().get(user.getByteArrayHandle());
-                    cache.getCredentialCache().remove(user.getByteArrayHandle());
+                    PublicKeyCredentialCreationOptions requestOptions = cache.getCredentialCache().get(user.getHandle());
+                    cache.getCredentialCache().remove(user.getHandle());
                     FinishRegistrationOptions options = FinishRegistrationOptions.builder()
                         .request(requestOptions)
                         .response(pkc)
