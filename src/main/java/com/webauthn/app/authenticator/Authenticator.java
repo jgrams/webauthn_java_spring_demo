@@ -39,23 +39,23 @@ public class Authenticator {
     @Column(nullable = false)
     private ByteArray publicKey;
 
-    @Column(nullable = false)
-    private Long count;
+@Column(nullable = false)
+private Long count;
 
-    @Lob
-    @Column(nullable = true)
-    private ByteArray aaguid;
+@Lob
+@Column(nullable = true)
+private ByteArray aaguid;
 
     @ManyToOne
     private AppUser user;
 
-    public Authenticator(RegistrationResult result, AuthenticatorAttestationResponse response, AppUser user, String name) {
-        Optional<AttestedCredentialData> attestationData = response.getAttestation().getAuthenticatorData().getAttestedCredentialData();
-        this.credentialId = result.getKeyId().getId();
-        this.publicKey = result.getPublicKeyCose();
-        this.aaguid = attestationData.get().getAaguid();
-        this.count = result.getSignatureCount();
-        this.name = name;
-        this.user = user;
-    }
+public Authenticator(RegistrationResult result, AuthenticatorAttestationResponse response, AppUser user, String name) {
+    Optional<AttestedCredentialData> attestationData = response.getAttestation().getAuthenticatorData().getAttestedCredentialData();
+    this.credentialId = result.getKeyId().getId();
+    this.publicKey = result.getPublicKeyCose();
+    this.aaguid = attestationData.get().getAaguid();
+    this.count = result.getSignatureCount();
+    this.name = name;
+    this.user = user;
+}
 }

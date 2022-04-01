@@ -2,10 +2,11 @@ package com.webauthn.app.web;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpSession;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webauthn.app.authenticator.Authenticator;
 import com.webauthn.app.user.AppUser;
-import com.webauthn.app.utility.EhCache;
 import com.webauthn.app.utility.Utility;
 import com.yubico.webauthn.AssertionRequest;
 import com.yubico.webauthn.AssertionResult;
@@ -40,12 +41,10 @@ public class AuthController {
 
     private RelyingParty relyingParty;
     private RegistrationService service;
-    private EhCache cache;
 
     AuthController(RegistrationService service, RelyingParty relyingPary) {
         this.relyingParty = relyingPary;
         this.service = service;
-        this.cache = new EhCache();
     }
 
     @GetMapping("/")
@@ -62,7 +61,8 @@ public class AuthController {
     @ResponseBody
     public String newUserRegistration(
         @RequestParam String username,
-        @RequestParam String display
+        @RequestParam String display,
+        HttpSession session
     ) {
         AppUser existingUser = service.getUserRepo().findByUsername(username);
         if (existingUser == null) {
@@ -73,7 +73,7 @@ public class AuthController {
                 .build();
             AppUser saveUser = new AppUser(userIdentity);
             service.getUserRepo().save(saveUser);
-            String response = newAuthRegistration(saveUser);
+            String response = newAuthRegistration(saveUser, session);
             return response;
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username " + username + " already exists. Choose a new name.");
@@ -83,7 +83,8 @@ public class AuthController {
     @PostMapping("/registerauth")
     @ResponseBody
     public String newAuthRegistration(
-        @RequestParam AppUser user
+        @RequestParam AppUser user,
+        HttpSession session
     ) {
         AppUser existingUser = service.getUserRepo().findByHandle(user.getHandle());
         if (existingUser != null) {
@@ -92,12 +93,12 @@ public class AuthController {
             .user(userIdentity)
             .build();
             PublicKeyCredentialCreationOptions registration = relyingParty.startRegistration(registrationOptions);
-            cache.getCredentialCache().put(userIdentity.getId(), registration);
-                try {
+            session.setAttribute(userIdentity.getDisplayName(), registration);
+            try {
                     return registration.toCredentialsCreateJson();
-                } catch (JsonProcessingException e) {
+            } catch (JsonProcessingException e) {
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing JSON.", e);
-                }
+            }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User " + user.getUsername() + " does not exist. Please register.");
         }
@@ -108,15 +109,15 @@ public class AuthController {
     public ModelAndView finishRegisration(
         @RequestParam String credential,
         @RequestParam String username,
-        @RequestParam String credname
+        @RequestParam String credname,
+        HttpSession session
     ) {
             try {
                 AppUser user = service.getUserRepo().findByUsername(username);
-                if (cache.getCredentialCache().containsKey(user.getHandle())) {
+                PublicKeyCredentialCreationOptions requestOptions = (PublicKeyCredentialCreationOptions) session.getAttribute(user.getUsername());
+                if (requestOptions != null) {
                     PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> pkc =
                     PublicKeyCredential.parseRegistrationResponseJson(credential);
-                    PublicKeyCredentialCreationOptions requestOptions = cache.getCredentialCache().get(user.getHandle());
-                    cache.getCredentialCache().remove(user.getHandle());
                     FinishRegistrationOptions options = FinishRegistrationOptions.builder()
                         .request(requestOptions)
                         .response(pkc)
@@ -129,10 +130,8 @@ public class AuthController {
                     throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cached request expired. Try to register again!");
                 }
             } catch (RegistrationFailedException e) {
-                System.out.println(e.getMessage());
                 throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Registration failed.", e);
             } catch (IOException e) {
-                System.out.println(e.getMessage());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to save credenital, please try again!", e);
             }
     }
@@ -145,16 +144,16 @@ public class AuthController {
     @PostMapping("/login")
     @ResponseBody
     public String startLogin(
-        @RequestParam String username
+        @RequestParam String username,
+        HttpSession session
     ) {
         AssertionRequest request = relyingParty.startAssertion(StartAssertionOptions.builder()
             .username(username)
             .build());
         try {
-            cache.getRequestCache().put(username, request);
+            session.setAttribute(username, request);
             return request.toCredentialsGetJson();
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -163,13 +162,13 @@ public class AuthController {
     public String finishLogin(
         @RequestParam String credential,
         @RequestParam String username,
-        Model model
+        Model model,
+        HttpSession session
     ) {
         try {
             PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> pkc;
             pkc = PublicKeyCredential.parseAssertionResponseJson(credential);
-            AssertionRequest request = cache.getRequestCache().get(username);
-            cache.getRequestCache().remove(username);
+            AssertionRequest request = (AssertionRequest)session.getAttribute(username);
             AssertionResult result = relyingParty.finishAssertion(FinishAssertionOptions.builder()
                 .request(request)
                 .response(pkc)
