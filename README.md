@@ -50,4 +50,4 @@ Please post any questions as comments on the [blog post], or visit our [Okta Dev
 
 Apache 2.0, see [LICENSE](LICENSE).
 
-[blog-post]: https://developer.okta.com/blog/TBD
+[blog-post]: https://developer.okta.com/blog/2022/04/26/webauthn-java
