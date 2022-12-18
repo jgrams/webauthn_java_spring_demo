@@ -93,7 +93,7 @@ public class AuthController {
             .user(userIdentity)
             .build();
             PublicKeyCredentialCreationOptions registration = relyingParty.startRegistration(registrationOptions);
-            session.setAttribute(userIdentity.getDisplayName(), registration);
+            session.setAttribute(user.getUsername(), registration);
             try {
                     return registration.toCredentialsCreateJson();
             } catch (JsonProcessingException e) {
