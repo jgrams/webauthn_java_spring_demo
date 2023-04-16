@@ -1,31 +1,13 @@
 package com.webauthn.app.web;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpSession;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webauthn.app.authenticator.Authenticator;
 import com.webauthn.app.user.AppUser;
 import com.webauthn.app.utility.Utility;
-import com.yubico.webauthn.AssertionRequest;
-import com.yubico.webauthn.AssertionResult;
-import com.yubico.webauthn.FinishAssertionOptions;
-import com.yubico.webauthn.FinishRegistrationOptions;
-import com.yubico.webauthn.RegistrationResult;
-import com.yubico.webauthn.RelyingParty;
-import com.yubico.webauthn.StartAssertionOptions;
-import com.yubico.webauthn.StartRegistrationOptions;
-import com.yubico.webauthn.data.AuthenticatorAssertionResponse;
-import com.yubico.webauthn.data.AuthenticatorAttestationResponse;
-import com.yubico.webauthn.data.ClientAssertionExtensionOutputs;
-import com.yubico.webauthn.data.ClientRegistrationExtensionOutputs;
-import com.yubico.webauthn.data.PublicKeyCredential;
-import com.yubico.webauthn.data.PublicKeyCredentialCreationOptions;
-import com.yubico.webauthn.data.UserIdentity;
+import com.yubico.webauthn.*;
+import com.yubico.webauthn.data.*;
 import com.yubico.webauthn.exception.AssertionFailedException;
 import com.yubico.webauthn.exception.RegistrationFailedException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,11 +18,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 public class AuthController {
 
-    private RelyingParty relyingParty;
-    private RegistrationService service;
+    private final RelyingParty relyingParty;
+    private final RegistrationService service;
+    private Map<String, PublicKeyCredentialCreationOptions> requestOptionMap = new HashMap<>();
+    private Map<String, AssertionRequest> assertionRequestMap = new HashMap<>();
 
     AuthController(RegistrationService service, RelyingParty relyingPary) {
         this.relyingParty = relyingPary;
@@ -61,8 +49,7 @@ public class AuthController {
     @ResponseBody
     public String newUserRegistration(
         @RequestParam String username,
-        @RequestParam String display,
-        HttpSession session
+        @RequestParam String display
     ) {
         AppUser existingUser = service.getUserRepo().findByUsername(username);
         if (existingUser == null) {
@@ -73,8 +60,7 @@ public class AuthController {
                 .build();
             AppUser saveUser = new AppUser(userIdentity);
             service.getUserRepo().save(saveUser);
-            String response = newAuthRegistration(saveUser, session);
-            return response;
+            return newAuthRegistration(saveUser);
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username " + username + " already exists. Choose a new name.");
         }
@@ -83,8 +69,7 @@ public class AuthController {
     @PostMapping("/registerauth")
     @ResponseBody
     public String newAuthRegistration(
-        @RequestParam AppUser user,
-        HttpSession session
+        @RequestParam AppUser user
     ) {
         AppUser existingUser = service.getUserRepo().findByHandle(user.getHandle());
         if (existingUser != null) {
@@ -93,7 +78,8 @@ public class AuthController {
             .user(userIdentity)
             .build();
             PublicKeyCredentialCreationOptions registration = relyingParty.startRegistration(registrationOptions);
-            session.setAttribute(user.getUsername(), registration);
+            this.requestOptionMap.put(user.getUsername(), registration);
+
             try {
                     return registration.toCredentialsCreateJson();
             } catch (JsonProcessingException e) {
@@ -109,12 +95,12 @@ public class AuthController {
     public ModelAndView finishRegisration(
         @RequestParam String credential,
         @RequestParam String username,
-        @RequestParam String credname,
-        HttpSession session
+        @RequestParam String credname
     ) {
             try {
                 AppUser user = service.getUserRepo().findByUsername(username);
-                PublicKeyCredentialCreationOptions requestOptions = (PublicKeyCredentialCreationOptions) session.getAttribute(user.getUsername());
+
+                PublicKeyCredentialCreationOptions requestOptions = this.requestOptionMap.get(username);
                 if (requestOptions != null) {
                     PublicKeyCredential<AuthenticatorAttestationResponse, ClientRegistrationExtensionOutputs> pkc =
                     PublicKeyCredential.parseRegistrationResponseJson(credential);
@@ -144,14 +130,13 @@ public class AuthController {
     @PostMapping("/login")
     @ResponseBody
     public String startLogin(
-        @RequestParam String username,
-        HttpSession session
+        @RequestParam String username
     ) {
         AssertionRequest request = relyingParty.startAssertion(StartAssertionOptions.builder()
             .username(username)
             .build());
         try {
-            session.setAttribute(username, request);
+            this.assertionRequestMap.put(username, request);
             return request.toCredentialsGetJson();
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -162,13 +147,12 @@ public class AuthController {
     public String finishLogin(
         @RequestParam String credential,
         @RequestParam String username,
-        Model model,
-        HttpSession session
+        Model model
     ) {
         try {
             PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> pkc;
             pkc = PublicKeyCredential.parseAssertionResponseJson(credential);
-            AssertionRequest request = (AssertionRequest)session.getAttribute(username);
+            AssertionRequest request = this.assertionRequestMap.get(username);
             AssertionResult result = relyingParty.finishAssertion(FinishAssertionOptions.builder()
                 .request(request)
                 .response(pkc)
